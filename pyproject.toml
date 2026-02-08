@@ -1,0 +1,81 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "polyglot-ui"
+dynamic = ["version"]
+description = "Smart translation workflow utilities for Django/Lino - extracts only the strings your app actually uses"
+readme = "README.rst"
+authors = [
+    {name = "8lurry", email = "sharifmehedi24@outlook.com"},
+]
+license = {text = "GPL-2.0"}
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: GNU General Public License v2 (GPLv2)",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.8",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Topic :: Software Development :: Internationalization",
+    "Topic :: Software Development :: Localization",
+]
+keywords = ["translation", "i18n", "l10n", "django", "lino", "gettext", "po", "gemini"]
+requires-python = ">=3.8"
+dependencies = [
+    "polib>=1.1.0",
+    "google-genai>=0.2.0",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=7.0.0",
+    "black>=22.0.0",
+    "flake8>=4.0.0",
+    "hatch>=1.9.0",
+    "twine>=4.0.0",
+]
+
+[project.scripts]
+polyglot-ui = "polyglot_ui.cli:main"
+
+[project.urls]
+Homepage = "https://github.com/8lurry/polyglot-ui"
+Documentation = "https://github.com/8lurry/polyglot-ui#readme"
+Repository = "https://github.com/8lurry/polyglot-ui"
+"Bug Tracker" = "https://github.com/8lurry/polyglot-ui/issues"
+
+[tool.hatch.build.targets.wheel]
+packages = ["polyglot_ui"]
+
+[tool.hatch.version]
+path = "polyglot_ui/__init__.py"
+
+[tool.black]
+line-length = 100
+target-version = ['py38', 'py39', 'py310', 'py311']
+include = '\.pyi?$'
+exclude = '''
+/(
+    \.git
+  | \.hg
+  | \.mypy_cache
+  | \.tox
+  | \.venv
+  | _build
+  | buck-out
+  | build
+  | dist
+)/
+'''
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+python_files = ["test_*.py", "*_test.py"]
+python_classes = ["Test*"]
+python_functions = ["test_*"]

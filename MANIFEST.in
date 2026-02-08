@@ -1,0 +1,4 @@
+include README.rst
+include LICENSE
+include pyproject.toml
+recursive-include polyglot_ui *.py
