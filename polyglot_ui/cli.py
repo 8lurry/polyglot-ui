@@ -61,7 +61,7 @@ def main():
     parser_modules = subparsers.add_parser(
         'modules',
         help='Extract untranslated strings from .po by checking imported modules',
-        description='Extract untranslated strings from .po files by checking occurrence comments against sys.modules. Requires Django context.'
+        description='Extract untranslated strings from .po files by checking occurrence comments against sys.modules. Use --all flag to extract all strings without filtering. Requires Django context (unless --all is used).'
     )
     parser_modules.add_argument(
         '-p', '--project_name',
@@ -82,6 +82,11 @@ def main():
         '-o', '--output_file',
         default='translateables.json',
         help='The output file to save the translatable strings (default: translateables.json).'
+    )
+    parser_modules.add_argument(
+        '--all',
+        action='store_true',
+        help='Extract all untranslated strings without filtering by sys.modules'
     )
     
     # Command: html

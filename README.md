@@ -34,7 +34,7 @@ polyglot-ui update -t translated.json -l lino --lang bn
 ## Commands
 
 - `helptexts` - Filter help texts by checking object accessibility
-- `modules` - Filter .po entries by checking imported modules  
+- `modules` - Filter .po entries by checking imported modules (use `--all` to extract everything)
 - `html` - Extract all untranslated HTML strings
 - `translate` - Translate using Gemini API
 - `update` - Update .po files with translations

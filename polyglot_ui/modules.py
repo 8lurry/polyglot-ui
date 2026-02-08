@@ -12,6 +12,9 @@ def run(args):
     mod = import_module(args.project_name)
     locale_root_dir = Path(import_module(args.locale_root).__file__).parent
     lino_po_path = locale_root_dir / "locale" / args.lang / "LC_MESSAGES" / "django.po"
+    
+    # Check if --all flag is set
+    extract_all = getattr(args, 'all', False)
 
     # Load the PO file
     po = polib.pofile(lino_po_path)
@@ -63,29 +66,32 @@ def run(args):
                 # If not relative to lino root, try just the filename as module
                 module_name = module_path.stem
             
-            # Check if module is in sys.modules
-            module_imported = False
-            
-            # Check exact match
-            if module_name in sys.modules:
+            # Check if module is in sys.modules (skip if --all flag is set)
+            if extract_all:
                 module_imported = True
             else:
-                # Check if any parent package is imported
-                parts = module_name.split('.')
-                for i in range(len(parts), 0, -1):
-                    partial_module = '.'.join(parts[:i])
-                    if partial_module in sys.modules:
-                        # Check if we can access the deeper attribute
-                        obj = sys.modules[partial_module]
-                        for j in range(i, len(parts)):
-                            if hasattr(obj, parts[j]):
-                                obj = getattr(obj, parts[j])
-                                if j == len(parts) - 1:
-                                    module_imported = True
-                            else:
+                module_imported = False
+                
+                # Check exact match
+                if module_name in sys.modules:
+                    module_imported = True
+                else:
+                    # Check if any parent package is imported
+                    parts = module_name.split('.')
+                    for i in range(len(parts), 0, -1):
+                        partial_module = '.'.join(parts[:i])
+                        if partial_module in sys.modules:
+                            # Check if we can access the deeper attribute
+                            obj = sys.modules[partial_module]
+                            for j in range(i, len(parts)):
+                                if hasattr(obj, parts[j]):
+                                    obj = getattr(obj, parts[j])
+                                    if j == len(parts) - 1:
+                                        module_imported = True
+                                else:
+                                    break
+                            if module_imported:
                                 break
-                        if module_imported:
-                            break
             
             # If module is imported and string not translated, add it
             if module_imported:
@@ -120,7 +126,10 @@ def run(args):
         # f.write(translatables_str)
         json.dump(translateables, f, ensure_ascii=False, indent=2)
 
-    print(f"\nTotal untranslated strings from imported modules: {len(translateables)}")
+    if extract_all:
+        print(f"\nTotal untranslated strings (all): {len(translateables)}")
+    else:
+        print(f"\nTotal untranslated strings from imported modules: {len(translateables)}")
     print(f"Written to {args.output_file}")
 
 
@@ -142,6 +151,11 @@ def main():
         "--output_file",
         help="The output file to save the translatable strings.",
         default="translateables.json",
+    )
+    parser.add_argument(
+        "--all",
+        action="store_true",
+        help="Extract all untranslated strings without filtering by sys.modules",
     )
     args = parser.parse_args()
     assert args.locale_root == args.project_name or args.locale_root.startswith(
